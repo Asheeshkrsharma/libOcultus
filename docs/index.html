@@ -1,0 +1,260 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>occultus</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">occultus</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> occultus</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="about">About</h1>
+				<p><img src="media/logo.png" alt=" "></p>
+				<p><em>Occultus</em>  (meaning “hidden, secret.” in  Latin) is a <a href="https://github.com/signalapp/libsignal-protocol-javascript">libsignal</a> based
+					library for building platforms which help you stay connected  with  your
+					friends, family, and other devices, <strong>securely</strong>. All  the communication
+					with  Occultus  is  <strong>End-To-End</strong> Encrypted. It was created by <em>Asheesh
+					Sharma</em> as  a  generic  <strong>E2EE</strong>  system for building much  more complex
+				systems such as secure internet of things, smart homes, and chats.</p>
+				<p>Internally, Occultus uses <a href="https://github.com/signalapp/libsignal-protocol-javascript">libsignal</a> by <a href="https://www.whispersystems.org">Open Whisper Systems</a>  for the
+					actual  data  encryption. With  Occultus, the  goal  was  to wrap around
+				<a href="https://www.npmjs.com/package/libsignal">libsignal-node</a>; from its &quot;messy&quot; inticrate details and provide:</p>
+				<ol>
+					<li>an  encrpyted  client-side interface  to  store important information
+					like chats, and Signal protocol&#39;s own handshake related stuff;</li>
+					<li>a secure client-side server interface to handle key sharing;</li>
+					<li>a Whatsapp style message <a href="https://www.whatsapp.com/security/WhatsApp-Security-Whitepaper.pdf">encryption for groups</a>;</li>
+					<li>an all in typescript solution! ☝😎</li>
+				</ol>
+				<p>For implementation details please refer to the <a href="./classes/_index_.occultus.html">Occultus</a> Class.</p>
+				<h2 id="security-check-status">Security check status</h2>
+				<p>The  checklist  is  based   on   <a href="https://medium.com/@nodepractices/were-under-attack-23-node-js-security-best-practices-e33c146cb87d">this   medium   article</a>.  Note   that
+					<strong>not required</strong> does not imply that the  security issues  will  not  be
+					considered  in  the  future.  Most   of  them  deal  with  server   side
+					communication  which  shall  be  implemented  within <a href="modules/_signalserverstore_.html">SignalServerStore</a>
+				interface or outside in its implimentation class.</p>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-XSS%20100%25-green.svg" alt="OWASP"></p>
+				<ul>
+					<li><input checked="" disabled="" type="checkbox"> Escape HTML, JS and CSS output <strong>not required</strong></li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-DDOS%20100%25-green.svg" alt="OWASP"></p>
+				<ul>
+					<li><input checked="" disabled="" type="checkbox"> Limit concurrent requests using a middleware <strong>not required</strong></li>
+					<li><input checked="" disabled="" type="checkbox"> Prevent evil RegEx from overloading your single  thread  execution
+					<strong>not required</strong></li>
+					<li><p>Re-generate client-side store keys randomly b/w writes.</p>
+						<p>  The database automatically  generates  a  new  encryption  key  when
+							something is written to it. For  performance  and  security reasons,
+							this  is  done  randomly  with  a  probability  of 0.5  which is not
+						configurable.</p>
+					</li>
+					<li><p>Avoid  DOS  attacks  by  explicitly  setting when a process should
+						crash <strong>not required</strong></p>
+					</li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-A1:Injection%20100%25-green.svg" alt="OWASP"></p>
+				<ul>
+					<li><input checked="" disabled="" type="checkbox"> Linting rule checks</li>
+					<li><input checked="" disabled="" type="checkbox"> Prevent query injection vulnerabilities with ORM/ODM libraries</li>
+					<li><p>Avoid module loading using a variable</p>
+						<p>  The store database requires a path which is a variable  supposed  to
+							be  configured  by  the  user.  According  to   this  vulnerability,
+							malicious  user input could  find its  way  to  the  database&#39;s path
+							variable which can be used to tamper the file. So, although we can&#39;t
+							take away  this configuaration  flexibility, but  we  can  hide  the
+						database as a private during runtime. This is what has been done.</p>
+					</li>
+					<li><p>Take extra care when working with child processes <strong>not required</strong></p>
+					</li>
+					<li><input checked="" disabled="" type="checkbox"> Prevent unsafe redirects <strong>not required</strong></li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-A4:External%20Entities%20100%25-green.svg" alt="OWASP"></p>
+				<ul>
+					<li><input checked="" disabled="" type="checkbox"> Avoid JavaScript eval statements <strong>not required</strong></li>
+					<li><input checked="" disabled="" type="checkbox"> Run unsafe code in a sandbox <strong>not required</strong></li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-A6:Security%20Misconfiguration%200%25-red.svg" alt="OWASP"></p>
+				<ul>
+					<li><input disabled="" type="checkbox"> Avoid publishing secrets to the npm registry <strong>not required</strong></li>
+					<li><input disabled="" type="checkbox"> Modify session middleware settings <strong>not required</strong></li>
+					<li><input disabled="" type="checkbox"> Configure 2FA for npm or Yarn <strong>not required</strong></li>
+					<li><input disabled="" type="checkbox"> Hide error details from clients</li>
+					<li><input disabled="" type="checkbox"> Adjust the HTTP response headers for enhanced security</li>
+					<li><input disabled="" type="checkbox"> Extract secrets from config files or use packages to encrypt them</li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-A8:Insecured%20Deserializaiton%200%25-red.svg" alt="OWASP"></p>
+				<ul>
+					<li><input disabled="" type="checkbox"> Validate incoming JSON schemas</li>
+					<li><input disabled="" type="checkbox"> Limit payload size using a reverse-proxy or a middleware</li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-A9:Known%20Vulnerabilities%20100%25-green.svg" alt="OWASP"></p>
+				<ul>
+					<li><p>Constantly and automatically inspect for vulnerable dependencies</p>
+						<p>  Can  be  done by running <code>npm audit</code>  and <code>npm run snyk</code> for a <a href="https://snyk.io/">snyk</a>
+						report.</p>
+					</li>
+				</ul>
+				<p><img src="https://img.shields.io/badge/OWASP%20Threats-A9:Broken%20Authentication%20100%25-green.svg" alt="OWASP"></p>
+				<ul>
+					<li><p>Avoid using the Node.js crypto library for handling passwords, use
+						Bcrypt</p>
+						<p>  Crypto&#39;s Encryption keys, are now hashed with Bcrypt. This  requires
+							for the user to provide a password. The database first authenticates
+							over  the  provided  password  using  bcrypt  before  it  can  start
+							interacting with the <a href="./modules/_signalclientstore_.html">Store</a> class. This makes it more difficult for
+							the  outsider  to  decrypt   the  actual  database   which  for  all
+							intended purposes, a JSON string.
+						<img src="media/clientDBMS.svg" alt="clientDb interactions"></p>
+						<p>  All that is needed however, is  to make sure that  the  database and
+						the key is stored somewhere safe.</p>
+					</li>
+					<li><input checked="" disabled="" type="checkbox"> Support blacklisting JWT tokens <strong>not required</strong></li>
+					<li><input checked="" disabled="" type="checkbox"> Limit the allowed login requests of each user <strong>not required</strong></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_signalclientstore_.html">"<wbr>Signal<wbr>Client<wbr>Store"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_signalprotocolmanager_.html">"<wbr>Signal<wbr>Protocol<wbr>Manager"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_signalserverstore_.html">"<wbr>Signal<wbr>Server<wbr>Store"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">"index"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

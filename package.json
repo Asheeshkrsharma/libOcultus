@@ -1,0 +1,41 @@
+{
+  "name": "occultus",
+  "version": "0.1.4",
+  "description": "E2EE module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "docs": "typedoc --options ./typedoc.js --out docs --excludeExternals src/index.ts src/SignalClientStore.ts src/SignalProtocolManager.ts src/SignalServerStore.ts --hideGenerator --media ./public",
+    "lint": "tslint --project \"./tsconfig.json\"",
+    "test": "mocha -r ts-node/register test/*.spec.ts",
+    "snyk": "snyk auth && snyk monitor"
+  },
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "author": "Asheesh Sharma",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "libsignal": "^2.0.1",
+    "lowdb": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/chai": "^4.1.7",
+    "@types/lowdb": "^1.0.9",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "snyk": "^1.193.2",
+    "ts-node": "^8.3.0",
+    "tsc-watch": "^2.2.1",
+    "tslint": "^5.18.0",
+    "tslint-config-security": "^1.16.0",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.5.2"
+  }
+}
