@@ -4,7 +4,10 @@ export declare class Occultus {
     constructor(userId: string, password: string, SSS: SignalServerStore, clientStorePath: string);
     init(): Promise<void>;
     encrypt(userId: string, message: string): Promise<string>;
-    decrypt(userId: string, cypher: string): Promise<string>;
+    decrypt(userId: string, cypher: string): Promise<{
+        message: string;
+        isNewUser: boolean;
+    }>;
 }
 export interface PreKeyBundle {
     identityKey: Buffer;

@@ -1,4 +1,5 @@
 import * as Occultus from '../dist/index';
+import fetch from 'node-fetch';
 
 /**
  * signal server database.
@@ -12,31 +13,59 @@ export class SignalServerStore implements Occultus.SignalServerStoreInterface {
         this.config = config;
         this.userBundles = [];
     }
-
     public async registerNewPreKeyBundle(userId: string,
                                          preKeyBundle: Occultus.PreKeyBundle)
         : Promise<boolean> {
-        this.userBundles.push({
-            userId,
-            prekeyBundle: preKeyBundle
-        });
-        const success: boolean = true;
-        return success;
+        const getData = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/registerNewPreKeyBundle/', {
+                method: 'post',
+                body: JSON.stringify({
+                        userId,
+                        bundle: preKeyBundle
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            });
+                const json = await response.json();
+                return json;
+            } catch (error) {
+                throw error;
+            }
+            };
+        return getData();
     }
 
     public async userIsExistant(userId: string): Promise<boolean> {
-        const isExistant = this.userBundles.findIndex((element) =>
-            element.userId === userId) === -1 ? false : true;
-        return isExistant;
+        const getData = async () => {
+            try {
+              const response = await fetch('http://localhost:8080/userIsExistant/', {
+                method: 'post',
+                body: JSON.stringify({userId}),
+                headers: { 'Content-Type': 'application/json' },
+            });
+              const json = await response.json();
+              return json;
+            } catch (error) {
+              throw error;
+            }
+          };
+        return getData();
     }
 
     public async getPreKeyBundle(userId: string): Promise<Occultus.PreKeyBundle | undefined> {
-        const index = this.userBundles.findIndex((element) =>
-            element.userId === userId);
-        let preKeyBundle;
-        if (index !== -1) {
-            preKeyBundle = this.userBundles[index].prekeyBundle;
-        }
-        return preKeyBundle;
+        const getData = async () => {
+            try {
+              const response = await fetch('http://localhost:8080/getPreKeyBundle/', {
+                method: 'post',
+                body: JSON.stringify({userId}),
+                headers: { 'Content-Type': 'application/json' },
+            });
+              const json = await response.json();
+              return json;
+            } catch (error) {
+              return undefined;
+            }
+          };
+        return getData();
     }
 }

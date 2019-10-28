@@ -101,10 +101,12 @@ export default class SignalProtocolManager {
     private async decryptMessageAsync(remoteUserId: string, cipherText: any) {
         const address: any = await this.store.loadSessionCipherAddress(remoteUserId);
         let sessionCipher;
+        let isNewUser = false;
         if (address == null) {
             const newAddress = new libsignal.ProtocolAddress(Buffer.from(remoteUserId)
                 .toString('base64'), 123);
             sessionCipher = await new libsignal.SessionCipher(this.store, newAddress);
+            isNewUser = true;
             this.store.storeSessionCipher(remoteUserId, sessionCipher);
         } else {
             sessionCipher = await new libsignal.SessionCipher(this.store, address);
@@ -114,11 +116,11 @@ export default class SignalProtocolManager {
         if (messageHasEmbeddedPreKeyBundle) {
             const decryptedMessage = await sessionCipher
                 .decryptPreKeyWhisperMessage(cipherText.body, 'binary');
-            return Converters.toString(decryptedMessage);
+            return {message: Converters.toString(decryptedMessage), isNewUser};
         } else {
             const decryptedMessage = await sessionCipher
                 .decryptWhisperMessage(cipherText.body, 'binary');
-            return Converters.toString(decryptedMessage);
+            return {message: Converters.toString(decryptedMessage), isNewUser};
         }
     }
 

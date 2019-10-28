@@ -21,7 +21,7 @@ export class Occultus {
      * be stored. This is completely safe as long as you key is hidden.
      */
     constructor(userId: string, password: string, SSS: SignalServerStore,
-                clientStorePath: string) {
+        clientStorePath: string) {
         privates.set(this, {
             _SPMPrivate: new SignalProtocolManager(userId,
                 SSS,
@@ -52,14 +52,15 @@ export class Occultus {
      * @param userId The userId using which the message was encrypted.
      * @param cypher The encrpted message.
      */
-    public async decrypt(userId: string, cypher: string): Promise<string> {
+    public async decrypt(userId: string, cypher: string):
+        Promise<{ message: string, isNewUser: boolean }> {
         return await privates.get(this)
             ._SPMPrivate.decryptMessageAsync(userId, cypher);
     }
 }
 
 // The Server side communication is handled by the implementation
-// of the SignalServerStoreInterface, outside Occult.
+// of the SignalServerStoreInterface, outside Occultus.
 export interface PreKeyBundle {
     identityKey: Buffer;
     registrationId: number;

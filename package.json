@@ -1,5 +1,5 @@
 {
-  "name": "occultus",
+  "name": "@asheeshkrsharma/liboccultus",
   "version": "0.1.4",
   "description": "E2EE module",
   "main": "dist/index.js",
@@ -13,8 +13,8 @@
     "snyk": "snyk auth && snyk monitor"
   },
   "repository": {
-    "type": "",
-    "url": ""
+    "type": "git",
+    "url": "https://github.com/Asheeshkrsharma/libOcultus.git"
   },
   "author": "Asheesh Sharma",
   "license": "ISC",
@@ -25,17 +25,28 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
-    "@types/chai": "^4.1.7",
+    "@types/chai": "^4.2.4",
     "@types/lowdb": "^1.0.9",
     "@types/mocha": "^5.2.7",
+    "@types/node-fetch": "^2.5.2",
+    "@types/request": "^2.48.3",
     "chai": "^4.2.0",
-    "mocha": "^6.1.4",
-    "snyk": "^1.193.2",
-    "ts-node": "^8.3.0",
-    "tsc-watch": "^2.2.1",
-    "tslint": "^5.18.0",
+    "mocha": "^6.2.2",
+    "node-fetch": "^2.6.0",
+    "snyk": "^1.239.2",
+    "ts-node": "^8.4.1",
+    "tsc-watch": "^2.4.0",
+    "tslint": "^5.20.0",
     "tslint-config-security": "^1.16.0",
-    "typedoc": "^0.14.2",
-    "typescript": "^3.5.2"
-  }
+    "typedoc": "^0.15.0",
+    "typescript": "^3.6.4"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "keywords": [
+    "open whisper system",
+    "libsignal protocol"
+  ]
 }

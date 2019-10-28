@@ -82,10 +82,12 @@ class SignalProtocolManager {
         return __awaiter(this, void 0, void 0, function* () {
             const address = yield this.store.loadSessionCipherAddress(remoteUserId);
             let sessionCipher;
+            let isNewUser = false;
             if (address == null) {
                 const newAddress = new libsignal.ProtocolAddress(Buffer.from(remoteUserId)
                     .toString('base64'), 123);
                 sessionCipher = yield new libsignal.SessionCipher(this.store, newAddress);
+                isNewUser = true;
                 this.store.storeSessionCipher(remoteUserId, sessionCipher);
             }
             else {
@@ -95,12 +97,12 @@ class SignalProtocolManager {
             if (messageHasEmbeddedPreKeyBundle) {
                 const decryptedMessage = yield sessionCipher
                     .decryptPreKeyWhisperMessage(cipherText.body, 'binary');
-                return Converters.toString(decryptedMessage);
+                return { message: Converters.toString(decryptedMessage), isNewUser };
             }
             else {
                 const decryptedMessage = yield sessionCipher
                     .decryptWhisperMessage(cipherText.body, 'binary');
-                return Converters.toString(decryptedMessage);
+                return { message: Converters.toString(decryptedMessage), isNewUser };
             }
         });
     }

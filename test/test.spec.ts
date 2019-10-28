@@ -93,7 +93,7 @@ describe('Validations tests on Occultus', () => {
         const message = 'how you doing?';
         const encrypted = await u1OC.encrypt('user12', message);
         const decrypted = await u2OC.decrypt('user11', encrypted);
-        expect(decrypted).to.equal(message);
+        expect(decrypted.message).to.equal(message);
     });
     it('Run encryption/decrption routine with someone eves dropping', async () => {
         const serverStoreConfig = {
@@ -118,7 +118,7 @@ describe('Validations tests on Occultus', () => {
         const message = 'how you doing?';
         const encrypted = await u1OC.encrypt('user2', message);
         const decrypted = await u2OC.decrypt('user1', encrypted);
-        expect(decrypted).to.equal(message);
+        expect(decrypted.message).to.equal(message);
 
         let result;
         try {
@@ -183,6 +183,7 @@ describe('Validations tests on Occultus', () => {
                 password: ''
             }
         };
+
         // Create an instance of Signal Server Store.
         const SSS = new SignalServerStore(serverStoreConfig);
         const u1OC = new Occultus.Occultus('user11', 'asdasd', SSS, dataDirectory);
