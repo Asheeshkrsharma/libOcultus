@@ -6,8 +6,8 @@ export declare class ClientStoreDataBase {
     private encryptionKeyPath;
     private userPasswordHash;
     constructor(userId: string, password: string, dBpath: string);
-    get(key: string): Promise<any>;
-    set(key: string, value: any): Promise<boolean>;
+    get(key: string): any;
+    set(key: string, value: any): boolean;
     remove(key: string): Promise<void>;
     private generateKey;
     private encrypt;

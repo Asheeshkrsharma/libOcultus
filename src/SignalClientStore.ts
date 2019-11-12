@@ -1,6 +1,7 @@
 import * as Converters from './Converter';
 
 import { ClientStoreDataBase } from './Database';
+import path from 'path';
 
 // tslint:disable-next-line: no-var-requires
 const libsignal = require('libsignal');
@@ -39,7 +40,7 @@ export class SignalClientStore {
     constructor(userId: string, password: string, dBPath: string) {
         this.store = {};
         this.userId = userId;
-
+        dBPath = `${path.resolve(dBPath)}/`;
         privates.set(this, {
             _database: new ClientStoreDataBase(this.userId, password, dBPath)
         });
@@ -59,33 +60,31 @@ export class SignalClientStore {
                 if (property === undefined || value === undefined
                     || property === null || value === null) {
                     throw new Error('Tried to store undefined/null');
-                    return false;
                 }
-                // console.log(`valueSet ${property}: ${JSON.stringify(value)}\n`);
                 target[property] = value;
-                privates.get(this)._database.set(property, target[property]);
+                privates.get(this)._database.set(property, value);
                 return true;
             },
-            get: async (target, property: string): Promise<any> => {
+            get: (target, property: string): any => {
+                let value: any;
                 if (property === null || property === undefined) {
                     throw new Error('Tried to get value for undefined/null key');
                 }
                 if (property in target) {
-                    return target[property];
+                    value = target[property];
                 } else {
                     // A crappy way to sync
-                    const value: any = await privates.get(this)._database.get(property);
+                    value = privates.get(this)._database.get(property);
                     if (target[property] !== value) {
                         target[property] = value;
                     }
                 }
-                // console.log(`valueGet ${property}: ${JSON.stringify(target[property])}\n`);
-                return target[property];
+                return value;
             }
         });
     }
 
-    public async remove(key: string) {
+    public remove(key: string) {
         delete this.store[key];
     }
 
@@ -93,7 +92,7 @@ export class SignalClientStore {
         return this.store[key];
     }
 
-    public async put(key: any, value: any) {
+    public put(key: any, value: any) {
         this.store[key] = value;
     }
 
@@ -283,11 +282,8 @@ export class SignalClientStore {
      */
     public async loadSession(identifier: string): Promise<any> {
         const sessionRecordJson = await this.store['session' + identifier];
-        let record;
-        if (sessionRecordJson !== undefined) {
-            record = SessionRecord.deserialize(sessionRecordJson);
-        }
-        return Promise.resolve(record);
+        return Promise.resolve( sessionRecordJson
+            !== undefined ? SessionRecord.deserialize(sessionRecordJson) : undefined);
     }
 
     /**
@@ -298,9 +294,7 @@ export class SignalClientStore {
      */
     public async storeSession(protocolAddressIdentifier: string, record: any): Promise<any> {
         const serialized = await record.serialize();
-        return Promise.resolve(
-            this.store['session' + protocolAddressIdentifier] =
-            serialized);
+        this.store['session' + protocolAddressIdentifier] = serialized;
     }
 
     /**
@@ -327,31 +321,5 @@ export class SignalClientStore {
             }
         }
         return await Promise.resolve();
-    }
-
-    /**
-     * Stores a session cipher
-     * @param protocolAddressIdentifier prekey identity attached to
-     * a message in a session
-     * @param cipher Encrypted session cypher
-     */
-    public storeSessionCipher(protocolAddressIdentifier: any, cipher: any) {
-        this.store['cipher' + protocolAddressIdentifier]
-            = { addr: { id: cipher.addr.id, deviceId: cipher.addr.deviceId } };
-    }
-
-    /**
-     * loads a encrypted session cipher
-     * @param protocolAddressIdentifier prekey identity attached to
-     * a message in a session
-     */
-    public async loadSessionCipherAddress(protocolAddressIdentifier: any) {
-        const cipher = await this.store['cipher' + protocolAddressIdentifier];
-        if (cipher === undefined) {
-            return null;
-        } else {
-            const address = new libsignal.ProtocolAddress(cipher.addr.id, cipher.addr.deviceId);
-            return address;
-        }
     }
 }

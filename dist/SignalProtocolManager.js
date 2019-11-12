@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -19,6 +20,7 @@ const Converters = __importStar(require("./Converter"));
 const libsignal = require('libsignal');
 class SignalProtocolManager {
     constructor(userId, signalServerStore, clientStore) {
+        this.contacts = [];
         this.userId = userId;
         this.store = clientStore;
         this.signalServerStore = signalServerStore;
@@ -31,8 +33,8 @@ class SignalProtocolManager {
             if (!isUserExistant) {
                 const identityKey = yield libsignal.keyhelper.generateIdentityKeyPair();
                 const registrationId = yield libsignal.keyhelper.generateRegistrationId();
-                yield this.store.put('identityKey', identityKey);
-                yield this.store.put('registrationId', registrationId);
+                this.store.put('identityKey', identityKey);
+                this.store.put('registrationId', registrationId);
                 const preKeyBundle = yield this.generatePreKeyBundleAsync(123, 456);
                 try {
                     yield this.signalServerStore.registerNewPreKeyBundle(this.userId, preKeyBundle);
@@ -41,68 +43,61 @@ class SignalProtocolManager {
                     throw new Error('Internal server Error');
                 }
             }
+            const contacts = yield this.store.get('contacts');
+            this.contacts = contacts === undefined ? [] : contacts;
         });
     }
     encryptMessageAsync(remoteUserId, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            const address = yield this.store.loadSessionCipherAddress(remoteUserId);
-            let sessionCipher;
-            if (address === null) {
-                const newAddress = new libsignal.ProtocolAddress(Buffer.from(remoteUserId).toString('base64'), 123);
-                const sessionBuilder = new libsignal.SessionBuilder(this.store, newAddress);
-                let remoteUserPreKey = yield this.signalServerStore.getPreKeyBundle(remoteUserId);
+            const bufferMsg = Converters.toBuffer(message);
+            const newUser = this.contacts.includes(remoteUserId) === false ? true : false;
+            const address = new libsignal.ProtocolAddress(Buffer.from(remoteUserId).toString('base64'), 123);
+            const sessionCipher = new libsignal.SessionCipher(this.store, address);
+            if (newUser) {
+                this.contacts.push(remoteUserId);
+                this.store.put('contacts', this.contacts);
+                const remoteUserKey = yield this.signalServerStore.getPreKeyBundle(remoteUserId);
+                const remoteUserPreKey = this.processPrekey(remoteUserKey);
                 if (remoteUserPreKey !== undefined) {
-                    remoteUserPreKey = {
-                        identityKey: Buffer.from(remoteUserPreKey.identityKey),
-                        registrationId: remoteUserPreKey.registrationId,
-                        preKey: {
-                            keyId: remoteUserPreKey.preKey.keyId,
-                            publicKey: Buffer.from(remoteUserPreKey.preKey.publicKey)
-                        },
-                        signedPreKey: {
-                            keyId: remoteUserPreKey.signedPreKey.keyId,
-                            publicKey: Buffer.from(remoteUserPreKey.signedPreKey.publicKey),
-                            signature: Buffer.from(remoteUserPreKey.signedPreKey.signature)
-                        }
-                    };
-                    sessionBuilder.initOutgoing(remoteUserPreKey);
-                    sessionCipher = new libsignal.SessionCipher(this.store, newAddress);
-                    this.store.storeSessionCipher(remoteUserId, sessionCipher);
+                    const builder = new libsignal.SessionBuilder(this.store, address);
+                    yield builder.initOutgoing(remoteUserPreKey);
                 }
+                else {
+                    throw new Error('Server was irresponsive');
+                }
+                const cipherText = yield sessionCipher.encrypt(bufferMsg);
+                return cipherText;
             }
             else {
-                sessionCipher = new libsignal.SessionCipher(this.store, address);
+                const sessionId = `${Buffer.from(remoteUserId).toString('base64')}.123`;
+                const session = yield this.store.loadSession(sessionId);
+                if (session === undefined) {
+                    const wait = (ms) => new Promise((r, _j) => setTimeout(r, ms));
+                    yield (() => __awaiter(this, void 0, void 0, function* () {
+                        yield wait(1);
+                        yield this.encryptMessageAsync(remoteUserId, message);
+                    }))();
+                }
+                const cipherText = yield sessionCipher.encrypt(bufferMsg);
+                return cipherText;
             }
-            const bufferMsg = Converters.toBuffer(message);
-            const cipherText = yield sessionCipher.encrypt(bufferMsg);
-            return cipherText;
         });
     }
     decryptMessageAsync(remoteUserId, cipherText) {
         return __awaiter(this, void 0, void 0, function* () {
-            const address = yield this.store.loadSessionCipherAddress(remoteUserId);
-            let sessionCipher;
-            let isNewUser = false;
-            if (address == null) {
-                const newAddress = new libsignal.ProtocolAddress(Buffer.from(remoteUserId)
+            try {
+                const address = new libsignal.ProtocolAddress(Buffer.from(remoteUserId)
                     .toString('base64'), 123);
-                sessionCipher = yield new libsignal.SessionCipher(this.store, newAddress);
-                isNewUser = true;
-                this.store.storeSessionCipher(remoteUserId, sessionCipher);
+                const sessionCipher = yield new libsignal.SessionCipher(this.store, address);
+                const sessionId = `${Buffer.from(remoteUserId).toString('base64')}.123`;
+                const session = yield this.store.loadSession(sessionId);
+                const decryptedMessage = cipherText.type === 1 ? yield sessionCipher
+                    .decryptWhisperMessage(cipherText.body) : yield sessionCipher
+                    .decryptPreKeyWhisperMessage(cipherText.body);
+                return Converters.toString(decryptedMessage);
             }
-            else {
-                sessionCipher = yield new libsignal.SessionCipher(this.store, address);
-            }
-            const messageHasEmbeddedPreKeyBundle = cipherText.type === 3;
-            if (messageHasEmbeddedPreKeyBundle) {
-                const decryptedMessage = yield sessionCipher
-                    .decryptPreKeyWhisperMessage(cipherText.body, 'binary');
-                return { message: Converters.toString(decryptedMessage), isNewUser };
-            }
-            else {
-                const decryptedMessage = yield sessionCipher
-                    .decryptWhisperMessage(cipherText.body, 'binary');
-                return { message: Converters.toString(decryptedMessage), isNewUser };
+            catch (error) {
+                throw error;
             }
         });
     }
@@ -128,6 +123,26 @@ class SignalProtocolManager {
                 }
             };
         });
+    }
+    processPrekey(preKey) {
+        if (preKey !== undefined) {
+            return {
+                identityKey: Buffer.from(preKey.identityKey),
+                registrationId: preKey.registrationId,
+                preKey: {
+                    keyId: preKey.preKey.keyId,
+                    publicKey: Buffer.from(preKey.preKey.publicKey)
+                },
+                signedPreKey: {
+                    keyId: preKey.signedPreKey.keyId,
+                    publicKey: Buffer.from(preKey.signedPreKey.publicKey),
+                    signature: Buffer.from(preKey.signedPreKey.signature)
+                }
+            };
+        }
+        else {
+            return undefined;
+        }
     }
 }
 exports.default = SignalProtocolManager;

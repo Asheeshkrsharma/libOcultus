@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -14,9 +15,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const Converters = __importStar(require("./Converter"));
 const Database_1 = require("./Database");
+const path_1 = __importDefault(require("path"));
 const libsignal = require('libsignal');
 const SessionRecord = libsignal.SessionRecord;
 const privates = new WeakMap();
@@ -24,6 +29,7 @@ class SignalClientStore {
     constructor(userId, password, dBPath) {
         this.store = {};
         this.userId = userId;
+        dBPath = `${path_1.default.resolve(dBPath)}/`;
         privates.set(this, {
             _database: new Database_1.ClientStoreDataBase(this.userId, password, dBPath)
         });
@@ -41,41 +47,37 @@ class SignalClientStore {
                 if (property === undefined || value === undefined
                     || property === null || value === null) {
                     throw new Error('Tried to store undefined/null');
-                    return false;
                 }
                 target[property] = value;
-                privates.get(this)._database.set(property, target[property]);
+                privates.get(this)._database.set(property, value);
                 return true;
             },
-            get: (target, property) => __awaiter(this, void 0, void 0, function* () {
+            get: (target, property) => {
+                let value;
                 if (property === null || property === undefined) {
                     throw new Error('Tried to get value for undefined/null key');
                 }
                 if (property in target) {
-                    return target[property];
+                    value = target[property];
                 }
                 else {
-                    const value = yield privates.get(this)._database.get(property);
+                    value = privates.get(this)._database.get(property);
                     if (target[property] !== value) {
                         target[property] = value;
                     }
                 }
-                return target[property];
-            })
+                return value;
+            }
         });
     }
     remove(key) {
-        return __awaiter(this, void 0, void 0, function* () {
-            delete this.store[key];
-        });
+        delete this.store[key];
     }
     get(key) {
         return this.store[key];
     }
     put(key, value) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.store[key] = value;
-        });
+        this.store[key] = value;
     }
     getIdentityKeyPair() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -196,18 +198,14 @@ class SignalClientStore {
     loadSession(identifier) {
         return __awaiter(this, void 0, void 0, function* () {
             const sessionRecordJson = yield this.store['session' + identifier];
-            let record;
-            if (sessionRecordJson !== undefined) {
-                record = SessionRecord.deserialize(sessionRecordJson);
-            }
-            return Promise.resolve(record);
+            return Promise.resolve(sessionRecordJson
+                !== undefined ? SessionRecord.deserialize(sessionRecordJson) : undefined);
         });
     }
     storeSession(protocolAddressIdentifier, record) {
         return __awaiter(this, void 0, void 0, function* () {
             const serialized = yield record.serialize();
-            return Promise.resolve(this.store['session' + protocolAddressIdentifier] =
-                serialized);
+            this.store['session' + protocolAddressIdentifier] = serialized;
         });
     }
     removeSession(protocolAddressIdentifier) {
@@ -223,22 +221,6 @@ class SignalClientStore {
                 }
             }
             return yield Promise.resolve();
-        });
-    }
-    storeSessionCipher(protocolAddressIdentifier, cipher) {
-        this.store['cipher' + protocolAddressIdentifier]
-            = { addr: { id: cipher.addr.id, deviceId: cipher.addr.deviceId } };
-    }
-    loadSessionCipherAddress(protocolAddressIdentifier) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const cipher = yield this.store['cipher' + protocolAddressIdentifier];
-            if (cipher === undefined) {
-                return null;
-            }
-            else {
-                const address = new libsignal.ProtocolAddress(cipher.addr.id, cipher.addr.deviceId);
-                return address;
-            }
         });
     }
 }

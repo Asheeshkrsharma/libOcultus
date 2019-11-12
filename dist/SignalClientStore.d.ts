@@ -7,9 +7,9 @@ export declare class SignalClientStore {
     private store;
     private userId;
     constructor(userId: string, password: string, dBPath: string);
-    remove(key: string): Promise<void>;
+    remove(key: string): void;
     get(key: string): any;
-    put(key: any, value: any): Promise<void>;
+    put(key: any, value: any): void;
     getIdentityKeyPair(): Promise<{
         pubKey: Buffer;
         privKey: Buffer;
@@ -50,6 +50,4 @@ export declare class SignalClientStore {
     storeSession(protocolAddressIdentifier: string, record: any): Promise<any>;
     removeSession(protocolAddressIdentifier: any): Promise<any>;
     removeAllSessions(protocolAddressIdentifier: any): Promise<any>;
-    storeSessionCipher(protocolAddressIdentifier: any, cipher: any): void;
-    loadSessionCipherAddress(protocolAddressIdentifier: any): Promise<any>;
 }

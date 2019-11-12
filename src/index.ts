@@ -1,6 +1,8 @@
 import SignalProtocolManager from './SignalProtocolManager';
 import { SignalServerStore } from './SignalServerStore';
 import { SignalClientStore } from './SignalClientStore';
+import { stat } from 'fs';
+import { Func } from 'mocha';
 
 const privates = new WeakMap();
 
@@ -13,6 +15,14 @@ const privates = new WeakMap();
  * the actual one and exposes two methods for encyption and decryption.
  */
 export class Occultus {
+    // Used to check the state of the Signal Protocol Manager.
+    // public status: {
+    //     statusInternal: boolean;
+    //     statusListener: (state: boolean) => void;
+    //     registerListener: (listener: any) => void;
+    //     value: boolean;
+    // };
+    public status: boolean = false;
     /**
      * Class to instantiate encryption and decryption routines.
      * @param userId The userId used to initialize the signal protocol manager.
@@ -21,12 +31,29 @@ export class Occultus {
      * be stored. This is completely safe as long as you key is hidden.
      */
     constructor(userId: string, password: string, SSS: SignalServerStore,
-        clientStorePath: string) {
+                clientStorePath: string) {
         privates.set(this, {
             _SPMPrivate: new SignalProtocolManager(userId,
                 SSS,
                 new SignalClientStore(userId, password, clientStorePath))
         });
+        this.status = false;
+        // this.status = {
+        //     statusInternal: false,
+        //     statusListener: (_state: boolean) => { return;},
+        //     set value(state: boolean) {
+        //       this.statusInternal = state;
+        //       if (state === true ) {
+        //         this.statusListener(state);
+        //       }
+        //     },
+        //     get value() {
+        //       return this.statusInternal;
+        //     },
+        //     registerListener(listener: any) {
+        //       this.statusListener = listener;
+        //     }
+        // };
     }
 
     /**
@@ -35,6 +62,8 @@ export class Occultus {
      */
     public async init() {
         await privates.get(this)._SPMPrivate.initializeAsync();
+        // this.status.value = true;
+        this.status = true;
     }
 
     /**
@@ -52,11 +81,10 @@ export class Occultus {
      * @param userId The userId using which the message was encrypted.
      * @param cypher The encrpted message.
      */
-    public async decrypt(userId: string, cypher: string):
-        Promise<{ message: string, isNewUser: boolean }> {
+    public async decrypt(userId: string, cypher: string): Promise<string> {
         return await privates.get(this)
             ._SPMPrivate.decryptMessageAsync(userId, cypher);
-    }
+    };
 }
 
 // The Server side communication is handled by the implementation
@@ -82,6 +110,7 @@ export interface ServerConfig {
         username: string;
         password: string;
     };
+    dataDir: string;
 }
 
 export interface SignalServerStoreInterface {

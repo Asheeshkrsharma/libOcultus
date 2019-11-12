@@ -100,8 +100,8 @@ export class ClientStoreDataBase {
      * The getter
      * @param key The property to be accessed
      */
-    public async get(key: string) {
-        return await this.database.get(key).value();
+    public get(key: string) {
+        return this.database.get(key).value();
     }
 
     /**
@@ -110,9 +110,9 @@ export class ClientStoreDataBase {
      * @param value The value of the accessed
      * property.
      */
-    public async set(key: string, value: any) {
+    public set(key: string, value: any) {
         try {
-            await this.database.set(key, value)
+            this.database.set(key, value)
                 .write();
             return true;
         } catch (error) {
