@@ -101,14 +101,14 @@ interface or outside in its implimentation class.
     interacting with the [Store] class. This makes it more difficult for
     the  outsider  to  decrypt   the  actual  database   which  for  all
     intended purposes, a JSON string.
-    ![clientDb interactions](media/clientDBMS.svg)
+    ![clientDb interactions](public/clientDBMS.svg)
 
     All that is needed however, is  to make sure that  the  database and
     the key is stored somewhere safe.
 * [x] Support blacklisting JWT tokens **not required**
 * [x] Limit the allowed login requests of each user **not required**
 
-[logo]: media/logo.png
+[logo]: public/logo.png
 [XSS]: https://img.shields.io/badge/OWASP%20Threats-XSS%20100%25-green.svg
 [Threats-DDOS]: https://img.shields.io/badge/OWASP%20Threats-DDOS%20100%25-green.svg
 [A1 Injection]: https://img.shields.io/badge/OWASP%20Threats-A1:Injection%20100%25-green.svg
